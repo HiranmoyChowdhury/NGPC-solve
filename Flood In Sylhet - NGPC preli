@@ -1,0 +1,294 @@
+#include<bits/stdc++.h>
+#define Dracarys      ios_base::sync_with_stdio(0);
+#define bug(x)        cerr<<#x<<'='<<x<<endl;
+#define lp(i,a,b)     for(int i=a; i<=b; i++)
+#define ll            long long
+#define eb            push_back
+#define pb            push_back
+#define umm           unordered_map
+using namespace std;
+typedef pair<ll, pair<ll, ll>> pd;
+double pi = 2*acos(0.0);
+long long mod=1000000007;
+ll intmx=2000000000000000000;
+ll lx[4]={0 , 0, 1, -1}, ly[4]={1, -1, 0, 0};
+struct comp {
+    constexpr bool operator()(pd const& a,pd const& b)
+        const noexcept{
+        return a.first > b.first;
+    }
+};
+ll bigmod(long long num, long long power){
+    if(power==0) return 1; long long x=bigmod(num, power/2); x*=x; x%=mod; if(power%2) x*=num;
+    return x%mod;
+}
+ll B[100099],H[100099];
+ll preBuilding[400099]={};
+ll maxWater[400099]={}, mxxx[400099]={};
+ll ans[100099]={}, kasease[100099]={};
+map<ll, ll> rTof, fTor;
+ll lft, rght, val , pos;
+vector<ll> vec;
+ll vecSize;
+void update3(ll n, ll l, ll r){
+    if(l==r){mxxx[n]=H[l]; return;}
+    ll mid=(l+r)/2, n1=n+n, n2=n+n+1;
+    update3(n1, l, mid); update3(n2, mid+1, r);
+    mxxx[n]=max(mxxx[n1], mxxx[n2]);
+}
+ll f3(ll n, ll l, ll r){
+    if(l>rght || r<lft) return 0;
+    if(l>=lft && r<=rght) return mxxx[n];
+    ll mid=(l+r)/2, n1=n+n, n2=n+n+1;
+    return max(f3(n1, l, mid), f3(n2, mid+1, r));
+}
+void build(ll n){
+    for(ll i=0; i<=n; i++) kasease[i]=intmx;
+    update3(1, 1, n);
+}
+void update(ll n, ll l, ll r){
+    if(val>r || val<l) return;
+    if(l==r){
+        preBuilding[n]=pos;
+        return;
+    }
+    ll mid=(l+r)/2, n1=n+n, n2=n+n+1;
+    update(n1, l, mid); update(n2, mid+1, r);
+    preBuilding[n]=max(preBuilding[n1], preBuilding[n2]);
+}
+ll f(ll n, ll l, ll r){
+    if(l>rght || r<lft) return 0;
+    if(l>=lft && r<=rght) return preBuilding[n];
+    ll mid=(l+r)/2, n1=n+n, n2=n+n+1;
+    return max(f(n1, l, mid), f(n2, mid+1, r));
+}
+void update2(ll n, ll l, ll r){
+    if(l>rght || r<lft) return;
+    if(l>=lft && r<=rght){
+        maxWater[n]=val;
+        return;
+    }
+    ll mid=(l+r)/2, n1=n+n, n2=n+n+1;
+    update2(n1, l, mid); update2(n2, mid+1, r);
+}
+ll f2(ll n, ll l, ll r){
+    if(l>pos || r<pos) return 0;
+    if(l==r) return maxWater[n];
+    ll mid=(l+r)/2, n1=n+n, n2=n+n+1;
+    ll ret=max(f2(n1, l, mid), f2(n2, mid+1, r));
+    return max(ret, maxWater[n]);
+}
+ll bs(ll num){
+    ll lo=0, hi=vecSize, cholo=20;
+    while(cholo--){
+        ll mid=(lo+hi)/2;
+        if(vec[mid]<num) lo=mid;
+        else hi=mid;
+    }
+    return vec[hi];
+}
+void solve(){
+    ll n;
+    cin>>n;
+
+    ll tot_human=0;
+
+    for(ll i=0; i<n; i++){ll x; cin>>x; tot_human+=x;}
+
+    for(ll i=1; i<=n; i++) cin>>B[i];
+    for(ll i=1; i<=n; i++) cin>>H[i];
+    build(n);
+    for(ll i=1; i<=n; i++){
+        vec.eb(B[i]); //vec.eb(H[i]);
+    }
+    vec.eb(intmx);
+    sort(vec.begin(), vec.end());
+    vecSize=vec.size();
+    ll curr=1;
+    for(auto x:vec){
+        if(rTof[x]>0) continue;
+        rTof[x]=curr;
+        fTor[curr]=x;
+        curr++;
+    }
+
+    ll prewater[n+5]={};
+
+
+    for(ll i=1; i<=n; i++){
+        lft=rTof[B[i]]; rght=curr;
+        ll got=f(1, 1, curr);  ///so, the water level from got+1 to i will be B[i]
+
+        lft=got+1; rght=i;
+        val=B[i];
+        update2(1, 1, n);  ///it will update current water level
+
+        ll keep=f3(1, 1, n);
+        kasease[i]=B[i]-keep;
+        kasease[i]=min(kasease[i], kasease[got]);
+
+
+        prewater[i]= (i-got) * B[i];
+        prewater[i]+=prewater[got];
+
+
+        pos=i; val=rTof[B[i]];
+        update(1, 1, curr);
+    }
+
+
+
+    ll currWater[n+5]={};
+    for(ll i=1; i<=n; i++){
+        pos=i;
+        currWater[i]=f2(1, 1, n);
+    }
+
+    ll posHouse[n+5]={};
+
+    for(ll i=n; i>=1; i--){
+        posHouse[i]=H[i]+posHouse[i+1];
+    }
+
+    ll minDiff=intmx;
+    for(ll i=1; i<=n; i++){
+        minDiff=min(minDiff, currWater[i]-H[i]);
+    }
+
+    ll minDiff2=intmx;
+    ll mx=0;
+    for(ll i=n-1; i>=1; i--){
+        mx=max(mx, B[i]);
+        minDiff2=min(minDiff2, mx-H[i]);
+    }
+
+
+
+
+    B[0]=intmx;
+    ll q; cin>>q;
+
+    vector<pair<ll, ll> > query;
+
+    for(ll i=1; i<=q; i++){
+        ll v;
+        cin>>v;
+        query.pb({v, i});
+    }
+    sort(query.begin(), query.end());
+
+    ll currPos=0;
+    for(ll i=0; i<=400009; i++) preBuilding[i]=0;
+
+    for(auto x: query){
+        ll v=x.first, caseNo=x.second;
+
+
+        if(v==0){
+            ans[caseNo]=max(0LL, tot_human-posHouse[1]);
+            continue;
+        }
+        if(v>=prewater[n]){
+            if(tot_human>0) ans[caseNo]=minDiff+tot_human;
+            continue;
+        }
+        if(tot_human==0){
+            ans[caseNo]=0;
+            continue;
+        }
+
+        ll lo=0, hi=n, cholo=20;
+        while(cholo--){
+            ll mid=(lo+hi)/2;
+            if(prewater[mid]<=v) lo=mid;
+            else hi=mid;
+        }
+        if(prewater[lo]==v){
+            ans[caseNo]=max(0LL, tot_human-posHouse[lo+1]);
+            continue;
+        }
+        for(ll i=currPos+1; i<=lo; i++){
+            currPos=i;
+            pos=i; val=rTof[B[i]];
+            update(1, 1, curr);
+        }
+
+
+        ll lo2=0, hi2=B[lo+1], cholo2=30;
+
+        ll canGpos=0;
+
+        while(cholo2--){
+            ll mid=(lo2+hi2)/2;
+
+            ll temp=bs(mid);
+
+            lft=rTof[temp]; rght=curr;
+            ll got=f(1, 1, curr);
+
+            ll waterPresent=(lo+1-got) * mid;
+            waterPresent+=prewater[got];
+
+            if(waterPresent>=v){
+                hi2=mid;
+                canGpos=got;
+            }
+            else lo2=mid;
+
+        }
+        ll presentHouses=posHouse[lo+2];
+        if(H[lo+1]>hi2) presentHouses+=H[lo+1]-hi2;
+
+        if(lo+1==n && H[lo+1]<hi2){
+            lft=canGpos+1; rght=n;
+            ll keep=f3(1, 1, n);
+
+            ll haha=hi2-keep;
+            haha=min(haha, kasease[canGpos]);
+            ans[caseNo]=tot_human+haha;
+
+
+            continue;
+        }
+
+        if(tot_human>presentHouses) ans[caseNo]=tot_human-presentHouses;
+
+
+
+    }
+
+    for(ll i=1; i<=q; i++) cout<<ans[i]<<endl;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+int main(){
+    Dracarys
+
+    ll t=1;
+
+    for(ll i=1; i<=t; i++){
+        solve();
+    }
+
+    return 0;
+}
+
+
+
+
+
+
