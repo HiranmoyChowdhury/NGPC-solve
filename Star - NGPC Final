@@ -1,0 +1,56 @@
+#include<bits/stdc++.h>
+#define Dracarys      ios_base::sync_with_stdio(0);
+#define bug(x)        cerr<<#x<<'='<<x<<endl;
+#define lp(i,a,b)     for(int i=a; i<=b; i++)
+#define ll            long long
+#define eb            push_back
+#define pb            push_back
+#define umm           unordered_map
+using namespace std;
+typedef pair<ll, pair<ll, ll>> pd;
+double pi = 2*acos(0.0);
+long long mod=1000000007;
+ll intmx=20000000000000000;
+ll lx[4]={0 , 0, 1, -1}, ly[4]={1, -1, 0, 0};
+struct comp {
+    constexpr bool operator()(pd const& a,pd const& b)
+        const noexcept{
+        return a.first > b.first;
+    }
+};
+ll bigmod(long long num, long long power){
+    if(power==0) return 1; long long x=bigmod(num, power/2); x*=x; x%=mod; if(power%2) x*=num;
+    return x%mod;
+}
+void solve(){
+    ll n, m;
+    cin>>n>>m;
+
+    ll keep=min(n, m);
+
+    ll ans=keep*4;
+    ans-=3;
+
+    cout<<ans<<endl;
+
+
+
+
+
+
+
+
+}
+int main(){
+    Dracarys
+
+    ll t=1;
+   // cin>>t;
+
+    for(ll i=1; i<=t; i++){
+       // printf("Case %lld: ", i);
+        solve();
+    }
+
+    return 0;
+}
