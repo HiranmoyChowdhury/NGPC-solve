@@ -1,0 +1,117 @@
+#include<bits/stdc++.h>
+#define Dracarys      ios_base::sync_with_stdio(0);
+#define bug(x)        cerr<<#x<<'='<<x<<endl;
+#define lp(i,a,b)     for(int i=a; i<=b; i++)
+#define ll            unsigned long long
+#define eb            push_back
+#define pb            push_back
+#define umm           unordered_map
+using namespace std;
+typedef pair<ll, pair<ll, ll>> pd;
+double pi = 2*acos(0.0);
+long long mod=4294967291;
+ll intmx=2000000000000000;
+//ll lx[4]={0 , 0, 1, -1}, ly[4]={1, -1, 0, 0};
+struct comp {
+    constexpr bool operator()(pd const& a,pd const& b)
+        const noexcept{
+        return a.first > b.first;
+    }
+};
+ll bigmod(ll num, ll power){
+    if(power==0) return 1; ll x=bigmod(num, power/2); x*=x; x%=mod; if(power%2) x*=num;
+    return x%mod;
+}
+void solve(){
+    ll n;
+    cin>>n;
+    ll radius=bigmod(2, n-1);
+
+    ll ans2=0;
+    if(n<10){
+        ll temp=1;
+        for(ll i=1; i<=n; i++){
+            ll keep=(radius*temp)%mod;
+            keep*=2;
+            keep%=mod;
+            ans2+=keep;
+            ans2%=mod;
+            temp*=3;
+            temp%=mod;
+        }
+        cout<<ans2<<endl;
+        return;
+
+    }
+
+
+    ll root=sqrt(n);
+
+    ll temp1=1, temp2=1;
+
+    ll keep1=0, keep2=0;
+
+    for(ll i=1; i<=root; i++){
+        keep1+=temp1;
+        keep1%=mod;
+
+        temp1*=3;
+        temp1%=mod;
+    }
+
+    for(ll i=1; i<=root; i++){
+        keep2+=temp2;
+        keep2%=mod;
+
+        temp2*=temp1;
+        temp2%=mod;
+    }
+
+    ll start=root*root;
+    start++;
+
+
+    ll ans=(keep1*keep2)%mod;
+
+
+    ll val=bigmod(3, root*root);
+
+
+    for(ll i=start; i<=n; i++){
+        ans+=val;
+        ans%=mod;
+
+        val*=3;
+        val%=mod;
+    }
+
+    ans*=radius;
+    ans%=mod;
+    ans*=2;
+    ans%=mod;
+
+    cout<<ans<<endl;
+
+
+
+
+
+
+
+
+
+
+}
+int main(){
+    Dracarys
+
+    ll t=1;
+   // cin>>t;
+
+    for(ll i=1; i<=t; i++){
+       // printf("Case %lld: ", i);
+        solve();
+    }
+
+    return 0;
+}
